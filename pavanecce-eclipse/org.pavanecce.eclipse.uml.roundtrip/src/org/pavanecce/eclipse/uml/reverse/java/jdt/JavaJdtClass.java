@@ -60,8 +60,8 @@ public class JavaJdtClass extends JdtAnnotated implements SourceClass {
 			baseType = factory.getClassDescriptor(typeBinding.getComponentType());
 		} else if (isCollection() && getTypeArguments().length == 1) {
 			baseType = getTypeArguments()[0];
-		}else{
-			baseType=this;
+		} else {
+			baseType = this;
 		}
 	}
 
@@ -103,7 +103,7 @@ public class JavaJdtClass extends JdtAnnotated implements SourceClass {
 
 	@Override
 	public String getQualifiedName() {
-		if(typeBinding.isPrimitive()){
+		if (typeBinding.isPrimitive()) {
 			return getName();
 		}
 		return typeBinding.getBinaryName();

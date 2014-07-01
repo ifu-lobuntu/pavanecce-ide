@@ -8,21 +8,23 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.actions.CompoundContributionItem;
 import org.pavanecce.eclipse.common.ICompoundContributionItem;
 
-public class DynamicReverseDbMenu extends CompoundContributionItem implements ICompoundContributionItem{
+public class DynamicReverseDbMenu extends CompoundContributionItem implements ICompoundContributionItem {
 	private IStructuredSelection selection;
+
 	@Override
-	public IContributionItem[] getContributionItems(){
-		if(selection.getFirstElement() instanceof JDBCSchema || selection.getFirstElement() instanceof JDBCTable){
+	public IContributionItem[] getContributionItems() {
+		if (selection.getFirstElement() instanceof JDBCSchema || selection.getFirstElement() instanceof JDBCTable) {
 			ReverseEngineerTablesAction a = new ReverseEngineerTablesAction(selection);
 			a.setText("Create UML Entities from Tables");
-//			PurgeDeletedRecordsAction a2 = new PurgeDeletedRecordsAction();
-//			a2.setText("Purge Deleted Records ");
-			return new IContributionItem[]{new ActionContributionItem(a)};
-		}else{
-			return new IContributionItem[]{};
+			// PurgeDeletedRecordsAction a2 = new PurgeDeletedRecordsAction();
+			// a2.setText("Purge Deleted Records ");
+			return new IContributionItem[] { new ActionContributionItem(a) };
+		} else {
+			return new IContributionItem[] {};
 		}
 	}
-	public DynamicReverseDbMenu(IStructuredSelection selection){
+
+	public DynamicReverseDbMenu(IStructuredSelection selection) {
 		super();
 		this.selection = selection;
 	}

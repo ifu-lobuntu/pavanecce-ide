@@ -63,16 +63,16 @@ public class ShapeBuilder extends UMLSwitch<Shape> {
 				classShape.getPersistedChildren().add(classNameDecorationNode);
 				String id = AssociationClassAttributeCompartmentEditPart.VISUAL_ID + "";
 				addAttributeCompartment(classShape, id, object);
-//				addCompartment(classShape, AssociationClassOperationCompartmentEditPart.VISUAL_ID + "");
-//				addCompartment(classShape, AssociationClassNestedClassifierCompartmentEditPart.VISUAL_ID + "");
+				// addCompartment(classShape, AssociationClassOperationCompartmentEditPart.VISUAL_ID + "");
+				// addCompartment(classShape, AssociationClassNestedClassifierCompartmentEditPart.VISUAL_ID + "");
 			} else {
 				classShape.setType(ClassEditPart.VISUAL_ID + "");
 				classNameDecorationNode.setType(ClassNameEditPart.VISUAL_ID + "");
 				classShape.getPersistedChildren().add(classNameDecorationNode);
 				String id = ClassAttributeCompartmentEditPart.VISUAL_ID + "";
-				addAttributeCompartment(classShape, id,object);
-//				addCompartment(classShape, ClassOperationCompartmentEditPart.VISUAL_ID + "");
-//				addCompartment(classShape, ClassNestedClassifierCompartmentEditPart.VISUAL_ID + "");
+				addAttributeCompartment(classShape, id, object);
+				// addCompartment(classShape, ClassOperationCompartmentEditPart.VISUAL_ID + "");
+				// addCompartment(classShape, ClassNestedClassifierCompartmentEditPart.VISUAL_ID + "");
 			}
 			classShape.setElement(object);
 			return classShape;
@@ -89,16 +89,16 @@ public class ShapeBuilder extends UMLSwitch<Shape> {
 			Bounds bnds = NotationFactory.eINSTANCE.createBounds();
 			bnds.setX(0);
 			bnds.setY(0);
-//			bnds.setHeight(20);
+			// bnds.setHeight(20);
 			propertyShape.setLayoutConstraint(bnds);
-			propertyShape.setType(PropertyForClassEditPart.VISUAL_ID+"");
+			propertyShape.setType(PropertyForClassEditPart.VISUAL_ID + "");
 			attrComp.getPersistedChildren().add(propertyShape);
-			
+
 		}
 		Bounds bnds = NotationFactory.eINSTANCE.createBounds();
 		bnds.setX(0);
 		bnds.setY(0);
-		bnds.setHeight((int)Math.ceil(object.getAttributes().size()*20)+20);
+		bnds.setHeight((int) Math.ceil(object.getAttributes().size() * 20) + 20);
 		bnds.setWidth(300);
 		classShape.setLayoutConstraint(bnds);
 	}

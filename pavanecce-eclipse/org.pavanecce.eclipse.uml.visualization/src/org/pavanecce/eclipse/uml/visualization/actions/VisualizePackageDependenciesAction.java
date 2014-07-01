@@ -16,25 +16,27 @@ import org.pavanecce.eclipse.uml.visualization.IDiagramCreator;
 import org.pavanecce.eclipse.uml.visualization.RelationshipDirection;
 import org.pavanecce.eclipse.uml.visualization.UmlVisualizationPlugin;
 
-public class VisualizePackageDependenciesAction extends AbstractEditingDomainAction{
-	Set<Element> elements=new HashSet<Element>();
-	public VisualizePackageDependenciesAction(IStructuredSelection selection){
+public class VisualizePackageDependenciesAction extends AbstractEditingDomainAction {
+	Set<Element> elements = new HashSet<Element>();
+
+	public VisualizePackageDependenciesAction(IStructuredSelection selection) {
 		super(selection, "Visualize Package Dependencies");
 		Object[] array = selection.toArray();
-		for(Object object:array){
+		for (Object object : array) {
 			EObject e = AdapterFinder.adaptObject(object);
-			if(e instanceof Package){
+			if (e instanceof Package) {
 				elements.add((Package) e);
 			}
 		}
 	}
+
 	@Override
-	public void run(){
+	public void run() {
 		Set<IDiagramCreator> diagramCreators = UmlVisualizationPlugin.getDefault().getDiagramCreators();
 		IEditorPart activeEditor = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
-		for(IDiagramCreator c:diagramCreators){
-			if(c.matches(activeEditor)){
-				c.createDiagram( "Package Dependencies", elements, activeEditor, RelationshipDirection.BOTH, UMLPackage.eINSTANCE.getPackageImport());
+		for (IDiagramCreator c : diagramCreators) {
+			if (c.matches(activeEditor)) {
+				c.createDiagram("Package Dependencies", elements, activeEditor, RelationshipDirection.BOTH, UMLPackage.eINSTANCE.getPackageImport());
 			}
 		}
 	}

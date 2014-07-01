@@ -41,7 +41,8 @@ public class VisualizeSpecializationTreeAction extends AbstractEditingDomainActi
 			IEditorPart activeEditor = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
 			for (IDiagramCreator c : diagramCreators) {
 				if (c.matches(activeEditor)) {
-					c.createDiagram("Specialization", elements, activeEditor, RelationshipDirection.BACKWARD, UMLPackage.eINSTANCE.getGeneralization(),UMLPackage.eINSTANCE.getInterfaceRealization());
+					c.createDiagram("Specialization", elements, activeEditor, RelationshipDirection.BACKWARD, UMLPackage.eINSTANCE.getGeneralization(),
+							UMLPackage.eINSTANCE.getInterfaceRealization());
 				}
 			}
 		}

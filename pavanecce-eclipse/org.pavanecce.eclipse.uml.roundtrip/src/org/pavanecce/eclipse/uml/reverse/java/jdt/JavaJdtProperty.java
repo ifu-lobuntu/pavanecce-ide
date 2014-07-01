@@ -226,7 +226,7 @@ public class JavaJdtProperty extends JdtAnnotated implements SourceProperty {
 		}
 		for (IVariableBinding vb : type.getDeclaredFields()) {
 			if (!(results.containsKey(vb.getName()) || vb.isEnumConstant())) {
-				if(vb.getType().getQualifiedName().equals("boolean") && results.containsKey("is"+NameConverter.capitalize(vb.getName()))){
+				if (vb.getType().getQualifiedName().equals("boolean") && results.containsKey("is" + NameConverter.capitalize(vb.getName()))) {
 					continue;
 				}
 				JavaJdtProperty pd = new JavaJdtProperty(vb, f);

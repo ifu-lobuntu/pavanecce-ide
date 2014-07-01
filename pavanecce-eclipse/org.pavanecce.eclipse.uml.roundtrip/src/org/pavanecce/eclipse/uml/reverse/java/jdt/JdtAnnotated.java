@@ -10,9 +10,10 @@ public class JdtAnnotated {
 
 	public JdtAnnotated(JavaDescriptorFactory factory) {
 		super();
-		this.factory=factory;
+		this.factory = factory;
 	}
-	protected void init(IAnnotationBinding[] source){
+
+	protected void init(IAnnotationBinding[] source) {
 		this.annotations = new SourceAnnotation[source.length];
 		for (int i = 0; i < annotations.length; i++) {
 			annotations[i] = new JavaJdtAnnotation(source[i], factory);

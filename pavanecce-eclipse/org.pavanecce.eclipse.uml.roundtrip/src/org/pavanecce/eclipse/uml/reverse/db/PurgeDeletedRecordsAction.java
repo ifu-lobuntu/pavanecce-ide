@@ -149,7 +149,8 @@ public class PurgeDeletedRecordsAction extends Action {
 					PersistentTable baseTable = (PersistentTable) fk.getBaseTable();
 					Connection jdbcConn = ((JDBCTable) baseTable).getConnection();
 					Statement st = jdbcConn.createStatement();
-					String swl = "alter table " + fk.getBaseTable().getSchema().getName() + "." + fk.getBaseTable().getName() + " drop constraint " + fk.getName();
+					String swl = "alter table " + fk.getBaseTable().getSchema().getName() + "." + fk.getBaseTable().getName() + " drop constraint "
+							+ fk.getName();
 					out.println(swl);
 					st.execute(swl);
 					dropNotNullConstraints(fk);
@@ -177,20 +178,21 @@ public class PurgeDeletedRecordsAction extends Action {
 		dropReferencingForeignKeys(superTable);
 		deleteAssociationTables(superTable);
 		String sql = "delete from " + superTable.getSchema().getName() + "." + superTable.getName() + " parent where (select deleted_on from "
-				+ originalFk.getBaseTable().getSchema().getName() + "." + originalFk.getBaseTable().getName() + " child  where " + buildFKJoiningColumns(originalFk) + ") < ?";// Use
-																																												// the
-																																												// original
-																																												// fk
-																																												// as
-																																												// it
-																																												// should
-																																												// only
-																																												// be
-																																												// referencing
-																																												// 'id'
-																																												// in
-																																												// the
-																																												// supertable
+				+ originalFk.getBaseTable().getSchema().getName() + "." + originalFk.getBaseTable().getName() + " child  where "
+				+ buildFKJoiningColumns(originalFk) + ") < ?";// Use
+																// the
+																// original
+																// fk
+																// as
+																// it
+																// should
+																// only
+																// be
+																// referencing
+																// 'id'
+																// in
+																// the
+																// supertable
 		executeDeleteByDeletedOnDate(superTable, sql);
 		List<ForeignKey> foreignKeys = superTable.getForeignKeys();
 		for (ForeignKey keyToParent : foreignKeys) {
@@ -243,8 +245,8 @@ public class PurgeDeletedRecordsAction extends Action {
 				// Probably just an oversight - all foreign keys should be
 				// nullable.
 				try {
-					String s = "alter table " + column.getTable().getSchema().getName() + "." + column.getTable().getName() + " alter column " + column.getName()
-							+ " drop nullable ";
+					String s = "alter table " + column.getTable().getSchema().getName() + "." + column.getTable().getName() + " alter column "
+							+ column.getName() + " drop nullable ";
 					out.println(s);
 					Statement st = ((JDBCForeignKey) fk).getConnection().createStatement();
 					out.println(st.executeUpdate(s) + " records updated");
@@ -267,9 +269,9 @@ public class PurgeDeletedRecordsAction extends Action {
 					Statement st = jdbcConn.createStatement();
 					PersistentTable referencedTable = getReferencedTable(fk);
 					List<Column> referencedMembers = getReferencedColumns(fk);
-					String create = "alter table " + baseTable.getSchema().getName() + "." + baseTable.getName() + " add constraint " + fk.getName() + " foreign key ("
-							+ toCommaSeperatedString(fk.getMembers()) + " ) references " + referencedTable.getSchema().getName() + "." + referencedTable.getName() + "("
-							+ toCommaSeperatedString(referencedMembers) + ")";
+					String create = "alter table " + baseTable.getSchema().getName() + "." + baseTable.getName() + " add constraint " + fk.getName()
+							+ " foreign key (" + toCommaSeperatedString(fk.getMembers()) + " ) references " + referencedTable.getSchema().getName() + "."
+							+ referencedTable.getName() + "(" + toCommaSeperatedString(referencedMembers) + ")";
 					st.execute(create);
 					out.println(create);
 					pm.worked(1);
@@ -428,7 +430,8 @@ public class PurgeDeletedRecordsAction extends Action {
 
 	private String buildNoMatchFoundWithSubSelect(ForeignKey fk, PersistentTable referencedTable) {
 		String string = buildFKJoiningColumns(fk);
-		String notMatched = "0 = (select count(*) from " + referencedTable.getSchema().getName() + "." + referencedTable.getName() + " parent where " + string + ")";
+		String notMatched = "0 = (select count(*) from " + referencedTable.getSchema().getName() + "." + referencedTable.getName() + " parent where " + string
+				+ ")";
 		return notMatched;
 	}
 

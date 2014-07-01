@@ -38,7 +38,6 @@ public class UmlVisualizationPlugin extends AbstractUIPlugin implements IRegistr
 
 	}
 
-
 	protected void addDiagramCreators(IConfigurationElement[] configurationElementsFor) {
 		for (IConfigurationElement e : configurationElementsFor) {
 			try {

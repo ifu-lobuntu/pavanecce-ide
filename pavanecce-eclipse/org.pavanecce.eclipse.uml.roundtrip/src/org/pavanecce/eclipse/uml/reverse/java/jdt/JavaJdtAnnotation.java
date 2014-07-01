@@ -12,7 +12,7 @@ import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.pavanecce.uml.reverse.java.sourcemodel.SourceAnnotation;
 import org.pavanecce.uml.reverse.java.sourcemodel.SourceClass;
 
-public class JavaJdtAnnotation  extends JdtAnnotated implements SourceAnnotation {
+public class JavaJdtAnnotation extends JdtAnnotated implements SourceAnnotation {
 
 	private SourceClass type;
 	private Map<String, Object> attributeValues = new HashMap<String, Object>();
@@ -56,7 +56,7 @@ public class JavaJdtAnnotation  extends JdtAnnotated implements SourceAnnotation
 			if (vb.isEnumConstant()) {
 				// Remember annotations wont have associations to enums nor
 				// inheritance - this will work:
-				value = new JavaJdtVariable(vb,factory);
+				value = new JavaJdtVariable(vb, factory);
 			}
 		} else if (fromValue instanceof ITypeBinding) {
 			value = this.factory.getClassDescriptor((ITypeBinding) fromValue);
@@ -67,7 +67,7 @@ public class JavaJdtAnnotation  extends JdtAnnotated implements SourceAnnotation
 	}
 
 	@Override
-	public Set<Entry<String, Object>>  getMemberValuePairs() {
+	public Set<Entry<String, Object>> getMemberValuePairs() {
 		return this.attributeValues.entrySet();
 	}
 

@@ -17,15 +17,15 @@ public class DynamicVisualizeMenu extends CompoundContributionItem implements IC
 	private IStructuredSelection selection;
 
 	@Override
-	public IContributionItem[] getContributionItems(){
-		if(AdapterFinder.adaptObject(selection.getFirstElement()) instanceof Element){
-			return new IContributionItem[]{new ActionContributionItem(new VisualizeClassesAction(selection)),
+	public IContributionItem[] getContributionItems() {
+		if (AdapterFinder.adaptObject(selection.getFirstElement()) instanceof Element) {
+			return new IContributionItem[] { new ActionContributionItem(new VisualizeClassesAction(selection)),
 					new ActionContributionItem(new VisualizeAssociationsAction(selection)),
 					new ActionContributionItem(new VisualizePackageDependenciesAction(selection)),
 					new ActionContributionItem(new VisualizeGeneralizationTreeAction(selection)),
-					new ActionContributionItem(new VisualizeSpecializationTreeAction(selection))};
-		}else{
-			return new IContributionItem[]{};
+					new ActionContributionItem(new VisualizeSpecializationTreeAction(selection)) };
+		} else {
+			return new IContributionItem[] {};
 		}
 	}
 

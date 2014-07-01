@@ -18,7 +18,7 @@ public class JavaDescriptorFactory {
 	private Map<IVariableBinding, JavaJdtVariable> fieldDescriptors = new HashMap<IVariableBinding, JavaJdtVariable>();
 
 	public JavaJdtClass getClassDescriptor(ITypeBinding b) {
-		if(b==null){
+		if (b == null) {
 			return null;
 		}
 		String key = JavaJdtClass.getIdentifier(b);

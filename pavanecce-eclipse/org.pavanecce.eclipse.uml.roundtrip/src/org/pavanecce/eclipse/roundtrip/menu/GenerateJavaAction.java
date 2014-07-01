@@ -47,40 +47,41 @@ public class GenerateJavaAction extends AbstractEditingDomainAction {
 			Object element = AdapterFinder.adaptObject(selection.getFirstElement());
 			if (element instanceof Model) {
 				Model model = (Model) element;
-				ElementTreeSelectionDialog dlg = new ElementTreeSelectionDialog(Display.getCurrent().getActiveShell(), WorkbenchLabelProvider
-                        .getDecoratingWorkbenchLabelProvider(), new BaseWorkbenchContentProvider() {
-					@Override
-					public Object[] getChildren(Object element) {
-						List<IResource> selectedElements = new ArrayList<IResource>();
-						if (element instanceof IProject) {
-							IProject p = (IProject) element;
-							try {
-								if (p.hasNature(JavaCore.NATURE_ID)) {
-									IJavaProject jp = JavaCore.create(p);
-									for (IPackageFragmentRoot pf : jp.getPackageFragmentRoots()) {
-										if (pf.getResource() instanceof IFolder) {
-											selectedElements.add(pf.getResource());
+				ElementTreeSelectionDialog dlg = new ElementTreeSelectionDialog(Display.getCurrent().getActiveShell(),
+						WorkbenchLabelProvider.getDecoratingWorkbenchLabelProvider(), new BaseWorkbenchContentProvider() {
+							@Override
+							public Object[] getChildren(Object element) {
+								List<IResource> selectedElements = new ArrayList<IResource>();
+								if (element instanceof IProject) {
+									IProject p = (IProject) element;
+									try {
+										if (p.hasNature(JavaCore.NATURE_ID)) {
+											IJavaProject jp = JavaCore.create(p);
+											for (IPackageFragmentRoot pf : jp.getPackageFragmentRoots()) {
+												if (pf.getResource() instanceof IFolder) {
+													selectedElements.add(pf.getResource());
+												}
+											}
 										}
+									} catch (Exception e) {
+
 									}
+								} else if (element instanceof IWorkspaceRoot) {
+									return ((IWorkspaceRoot) element).getProjects();
 								}
-							} catch (Exception e) {
-
+								return selectedElements.toArray(new Object[selectedElements.size()]);
 							}
-						}else if(element instanceof IWorkspaceRoot){
-							return ((IWorkspaceRoot) element).getProjects();
-						}
-						return selectedElements.toArray(new Object[selectedElements.size()]);
-					}
-					@Override
-					public boolean hasChildren(Object element) {
-						return element instanceof IContainer;
-					}
 
-					@Override
-					public Object[] getElements(Object element) {
-						return ((IWorkspaceRoot)element).getProjects();
-					}
-				});
+							@Override
+							public boolean hasChildren(Object element) {
+								return element instanceof IContainer;
+							}
+
+							@Override
+							public Object[] getElements(Object element) {
+								return ((IWorkspaceRoot) element).getProjects();
+							}
+						});
 				dlg.setInput(ResourcesPlugin.getWorkspace().getRoot());
 				dlg.setBlockOnOpen(true);
 				dlg.open();
@@ -93,7 +94,7 @@ public class GenerateJavaAction extends AbstractEditingDomainAction {
 					File outputRoot = folder.getProject().getLocation().toFile().getParentFile();
 					JavaCodeGenerator jcd = new JavaCodeGenerator();
 					jcd.addDecorator(new JpaCodeDecorator());
-					JavaTextFileGenerator jtfg = new JavaTextFileGenerator(tw,jcd);
+					JavaTextFileGenerator jtfg = new JavaTextFileGenerator(tw, jcd);
 					SourceFolderDefinition sfd = new SourceFolderDefinition(SourceFolderNameStrategy.QUALIFIER_ONLY, folder.getProjectRelativePath().toString());
 					TextProjectDefinition tpd = new TextProjectDefinition(ProjectNameStrategy.SUFFIX_ONLY, folder.getProject().getName());
 					jtfg.mapSourceFolder(JavaTextFileGenerator.DOMAIN, tpd, sfd);

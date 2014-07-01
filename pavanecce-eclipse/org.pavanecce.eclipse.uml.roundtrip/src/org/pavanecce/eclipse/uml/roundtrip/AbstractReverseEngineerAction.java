@@ -91,10 +91,11 @@ public abstract class AbstractReverseEngineerAction extends AbstractEditingDomai
 		try {
 			EditingDomain ed = (EditingDomain) selectedEditor.getAdapter(EditingDomain.class);
 			final EList<Resource> resources = ed.getResourceSet().getResources();
-			Package model=null;
+			Package model = null;
 			for (Resource resource : resources) {
-				if(resource.getURI().trimFileExtension().lastSegment().equals(file.getLocation().removeFileExtension().lastSegment()) && resource.getURI().fileExtension().equals("uml")){
-					model=(Package) resource.getContents().get(0);
+				if (resource.getURI().trimFileExtension().lastSegment().equals(file.getLocation().removeFileExtension().lastSegment())
+						&& resource.getURI().fileExtension().equals("uml")) {
+					model = (Package) resource.getContents().get(0);
 				}
 			}
 			ed.getCommandStack().execute(buildCommand(model));

@@ -1,4 +1,4 @@
 package org.pavanecce.eclipse.uml.visualization;
 
-public enum VisualizationHint{
+public enum VisualizationHint {
 }

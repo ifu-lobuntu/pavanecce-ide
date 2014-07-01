@@ -28,7 +28,7 @@ import org.junit.Test;
 import org.pavanecce.eclipse.uml.reverse.db.ReverseEngineerTablesAction;
 
 public class ReverseDatabaseTests {
-	
+
 	private static final String OUR_DRIVER_ID = "Our Driver ID";
 
 	@Test
@@ -52,7 +52,8 @@ public class ReverseDatabaseTests {
 			list(baseProperties);
 		}
 		Properties baseProperties = new Properties();
-		baseProperties.setProperty(IDriverMgmtConstants.PROP_DEFN_JARLIST, "/home/ampie/.m2/repository/mysql/mysql-connector-java/5.1.23/mysql-connector-java-5.1.23.jar");
+		baseProperties.setProperty(IDriverMgmtConstants.PROP_DEFN_JARLIST,
+				"/home/ampie/.m2/repository/mysql/mysql-connector-java/5.1.23/mysql-connector-java-5.1.23.jar");
 		baseProperties.setProperty(IJDBCDriverDefinitionConstants.DRIVER_CLASS_PROP_ID, "com.mysql.jdbc.Driver"); //$NON-NLS-1$
 		baseProperties.setProperty(IJDBCDriverDefinitionConstants.URL_PROP_ID, "jdbc:mysql://localhost:3306/test");
 		baseProperties.setProperty(IJDBCDriverDefinitionConstants.USERNAME_PROP_ID, "root");

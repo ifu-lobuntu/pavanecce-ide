@@ -7,9 +7,9 @@ import org.pavanecce.common.code.metamodel.CodeModel;
 import org.pavanecce.common.code.metamodel.CodePackage;
 
 public class CodeModelVisitorAdapter {
-	public void startVisiting(CodeModel codeModel, DefaultCodeModelVisitor v){
-		visitRecursively(v, codeModel); 
-		
+	public void startVisiting(CodeModel codeModel, DefaultCodeModelVisitor v) {
+		visitRecursively(v, codeModel);
+
 	}
 
 	protected void visitRecursively(DefaultCodeModelVisitor v, CodePackage cp) {

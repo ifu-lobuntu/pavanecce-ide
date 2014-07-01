@@ -30,6 +30,6 @@ public class ReverseJdtTests {
 		ReverseEngineerSimpleClassesAction action = new ReverseEngineerSimpleClassesAction(new StructuredSelection(pfr.getChildren()));
 		action.reverseInto(modelFile);
 		ap.closeEditor(ed, false);
-		
+
 	}
 }

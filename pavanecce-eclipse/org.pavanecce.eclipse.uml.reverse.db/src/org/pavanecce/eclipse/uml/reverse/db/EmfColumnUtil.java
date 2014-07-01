@@ -1,6 +1,7 @@
 package org.pavanecce.eclipse.uml.reverse.db;
 
-import static org.pavanecce.uml.common.util.TagNames.*;
+import static org.pavanecce.uml.common.util.TagNames.LINKED_PROPERTIES;
+import static org.pavanecce.uml.common.util.TagNames.SOURCE_PERSISTENT_NAME;
 
 import java.util.List;
 
@@ -12,7 +13,7 @@ import org.eclipse.datatools.modelbase.sql.tables.PersistentTable;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.uml2.uml.Association;
-import org.eclipse.uml2.uml.Class;
+import org.eclipse.uml2.uml.Classifier;
 import org.eclipse.uml2.uml.Property;
 import org.eclipse.uml2.uml.Stereotype;
 import org.pavanecce.uml.common.util.EmfPropertyUtil;
@@ -45,7 +46,7 @@ public class EmfColumnUtil {
 				&& ((Column) binding.getPrimaryKey().getMembers().get(0)).getName().equals("id") && (c.getDataType() instanceof NumberDataType);
 	}
 
-	public static Association findAssociation(Class fromClass, ForeignKey foreignKey) {
+	public static Association findAssociation(Classifier fromClass, ForeignKey foreignKey) {
 		Association ass = null;
 		for (Association cur : fromClass.getAssociations()) {
 			if (PersistentNameUtil.getPersistentName(cur).equals(foreignKey.getName())) {

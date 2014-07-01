@@ -45,7 +45,8 @@ public class CreateClassDiagramNotationElementsCommand extends AbstractCommand {
 	private Map<Element, Shape> shapes = new HashMap<Element, Shape>();
 	private String suffix;
 
-	public CreateClassDiagramNotationElementsCommand(Collection<? extends Element> elements2, ModelSet modelSet, EClass[] relationshipTypes, RelationshipDirection d, String suffix) {
+	public CreateClassDiagramNotationElementsCommand(Collection<? extends Element> elements2, ModelSet modelSet, EClass[] relationshipTypes,
+			RelationshipDirection d, String suffix) {
 		super();
 		relationshipExtractor = new RelationshipExtractor(relationshipTypes, d);
 		this.elements = elements2;

@@ -23,71 +23,75 @@ import org.pavanecce.eclipse.uml.visualization.IDiagramCreator;
 import org.pavanecce.eclipse.uml.visualization.RelationshipDirection;
 import org.pavanecce.eclipse.uml.visualization.UmlVisualizationPlugin;
 
-public class ReverseEngineerMavenProjectsAction extends AbstractReverseEngineerAction{
+public class ReverseEngineerMavenProjectsAction extends AbstractReverseEngineerAction {
 
-	public ReverseEngineerMavenProjectsAction(IStructuredSelection selection){
-		super(selection,"Reverse Engineer Maven Projects to Packages");
+	public ReverseEngineerMavenProjectsAction(IStructuredSelection selection) {
+		super(selection, "Reverse Engineer Maven Projects to Packages");
 	}
+
 	@Override
-	protected Command buildCommand(final Package model){
-		try{
+	protected Command buildCommand(final Package model) {
+		try {
 			final Collection<IContainer> types = selectContainers(selection);
-			return new AbstractCommand(){
+			return new AbstractCommand() {
 				@Override
-				public boolean canExecute(){
+				public boolean canExecute() {
 					return true;
 				}
+
 				@Override
-				public void execute(){
+				public void execute() {
 					ProgressMonitorDialog dlg = null;
-					try{
+					try {
 						dlg = new ProgressMonitorDialog(Display.getCurrent().getActiveShell());
 						dlg.setBlockOnOpen(false);
 						dlg.open();
 						Collection<Package> elements = new PackageGeneratorFromPoms((Model) model).generateUml(types, dlg.getProgressMonitor());
 						Set<IDiagramCreator> diagramCreators = UmlVisualizationPlugin.getDefault().getDiagramCreators();
-						for(IDiagramCreator c:diagramCreators){
-							if(c.matches(selectedEditor)){
-								c.createDiagram("Overview", elements, selectedEditor,RelationshipDirection.BOTH,UMLPackage.eINSTANCE.getPackageImport());
+						for (IDiagramCreator c : diagramCreators) {
+							if (c.matches(selectedEditor)) {
+								c.createDiagram("Overview", elements, selectedEditor, RelationshipDirection.BOTH, UMLPackage.eINSTANCE.getPackageImport());
 							}
 						}
-					}catch(Exception e){
+					} catch (Exception e) {
 						CommonEclipsePlugin.logError("Could not reverse Java classes", e);
 						MessageDialog.openError(Display.getCurrent().getActiveShell(), "Reverse Engineering Failed", e.toString());
-					}finally{
-						if(dlg != null){
-							if(dlg.getProgressMonitor() != null){
+					} finally {
+						if (dlg != null) {
+							if (dlg.getProgressMonitor() != null) {
 								dlg.getProgressMonitor().done();
 							}
 							dlg.close();
 						}
 					}
 				}
+
 				@Override
-				public void redo(){
+				public void redo() {
 				}
 			};
-		}catch(Exception e){
+		} catch (Exception e) {
 			CommonEclipsePlugin.logError("Could not reverse Java classes", e);
 			return DO_NOTHING;
 		}
 	}
-	private Collection<IContainer> selectContainers(IStructuredSelection selection){
+
+	private Collection<IContainer> selectContainers(IStructuredSelection selection) {
 		Object[] array = selection.toArray();
-		Collection<IContainer> result=new HashSet<IContainer>();
-		for(Object object:array){
+		Collection<IContainer> result = new HashSet<IContainer>();
+		for (Object object : array) {
 			IResource r = null;
-			if(object instanceof IResource){
+			if (object instanceof IResource) {
 				r = (IResource) object;
-			}else if(object instanceof IAdaptable){
+			} else if (object instanceof IAdaptable) {
 				IAdaptable a = (IAdaptable) object;
 				r = (IResource) a.getAdapter(IResource.class);
 			}
-			
-			if(r instanceof IContainer){
+
+			if (r instanceof IContainer) {
 				IContainer c = (IContainer) r;
 				IResource p = c.findMember("pom.xml");
-				if(p!=null && p.exists()){
+				if (p != null && p.exists()) {
 					result.add(c);
 				}
 			}

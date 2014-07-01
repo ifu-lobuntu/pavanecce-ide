@@ -4,14 +4,14 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.pavanecce.uml.reverse.java.AbstractUmlGenerator;
 import org.pavanecce.uml.reverse.java.SimpleUmlGenerator;
 
-public class ReverseEngineerSimpleClassesAction extends AbstractReverseEngineerJavaAction{
+public class ReverseEngineerSimpleClassesAction extends AbstractReverseEngineerJavaAction {
 
-	public ReverseEngineerSimpleClassesAction(IStructuredSelection selection){
-		super(selection,"Reverse Engineer Normal Classes");
+	public ReverseEngineerSimpleClassesAction(IStructuredSelection selection) {
+		super(selection, "Reverse Engineer Normal Classes");
 	}
 
 	@Override
-	protected AbstractUmlGenerator createGenerator(){
+	protected AbstractUmlGenerator createGenerator() {
 		return new SimpleUmlGenerator();
 	}
 }

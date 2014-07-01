@@ -15,13 +15,13 @@ Require-Bundle: org.eclipse.jdt.core,
  org.eclipse.core.expressions,
  org.pavanecce.common.util,
  org.pavanecce.eclipse.common,
- org.pavanecce.uml.uml2code,
  org.eclipse.m2e.model.edit;bundle-version="[1.4.0,2.0.0)",
  org.pavanecce.uml.reverse.java,
  org.pavanecce.eclipse.uml.reverse.db,
  org.pavanecce.common.text.workspace,
  org.pavanecce.eclipse.uml.visualization,
- org.pavanecce.common.code.metamodel
+ org.pavanecce.common.code.metamodel,
+ org.pavanecce.uml.uml2code;bundle-version="0.0.1"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: org.pavanecce.eclipse.common.CommonEclipsePlugin

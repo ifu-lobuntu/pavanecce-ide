@@ -19,35 +19,38 @@ import org.pavanecce.eclipse.common.ICompoundContributionItem;
 import org.pavanecce.eclipse.uml.reverse.db.DynamicReverseDbMenu;
 import org.pavanecce.eclipse.uml.reverse.java.DynamicReverseJavaMenu;
 
-public class ReversalContributionFactory extends ExtensionContributionFactory{
-	Expression visibleWhen = new Expression(){
+public class ReversalContributionFactory extends ExtensionContributionFactory {
+	Expression visibleWhen = new Expression() {
 		@Override
-		public EvaluationResult evaluate(IEvaluationContext context) throws CoreException{
+		public EvaluationResult evaluate(IEvaluationContext context) throws CoreException {
 			return EvaluationResult.TRUE;
 		}
 	};
-	public ReversalContributionFactory(){
+
+	public ReversalContributionFactory() {
 	}
+
 	@Override
-	public void createContributionItems(IServiceLocator serviceLocator,IContributionRoot additions){
+	public void createContributionItems(IServiceLocator serviceLocator, IContributionRoot additions) {
 		ISelectionService s = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getSelectionService();
-		if(s.getSelection() instanceof IStructuredSelection){
+		if (s.getSelection() instanceof IStructuredSelection) {
 			MenuManager menuManager = new MenuManager("Reverse");
 			IStructuredSelection selection = (IStructuredSelection) s.getSelection();
 			maybeAddMenu(menuManager, new DynamicReverseDbMenu(selection));
 			maybeAddMenu(menuManager, new DynamicReverseJavaMenu(selection));
 			EObject adaptObject = AdapterFinder.adaptObject(selection.getFirstElement());
-			if(adaptObject instanceof Model){
+			if (adaptObject instanceof Model) {
 				menuManager.add(new GenerateJavaAction(selection));
 			}
-			if(!menuManager.isEmpty()){
+			if (!menuManager.isEmpty()) {
 				additions.addContributionItem(menuManager, visibleWhen);
 			}
 		}
 	}
-	public void maybeAddMenu(MenuManager menuManager,ICompoundContributionItem menu){
+
+	public void maybeAddMenu(MenuManager menuManager, ICompoundContributionItem menu) {
 		IContributionItem[] contributionItems = menu.getContributionItems();
-		if(contributionItems.length>0){
+		if (contributionItems.length > 0) {
 			menuManager.add(menu);
 		}
 	}

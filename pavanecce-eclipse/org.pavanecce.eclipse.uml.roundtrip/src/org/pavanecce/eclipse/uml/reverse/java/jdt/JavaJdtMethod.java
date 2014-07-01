@@ -81,9 +81,9 @@ public class JavaJdtMethod extends JdtAnnotated implements SourceMethod {
 	public boolean isAccessor() {
 		String propertyName = NameConverter.extractPropertyName(binding.getName());
 		SourceProperty pd = declaringClass.getPropertyDescriptors().get(propertyName);
-		if(pd==null){
-			if(getName().startsWith("set") && getParameterTypes().length==1 && getParameterTypes()[0].getName().equals("boolean")){
-				pd=declaringClass.getPropertyDescriptors().get("is"+NameConverter.capitalize(propertyName));
+		if (pd == null) {
+			if (getName().startsWith("set") && getParameterTypes().length == 1 && getParameterTypes()[0].getName().equals("boolean")) {
+				pd = declaringClass.getPropertyDescriptors().get("is" + NameConverter.capitalize(propertyName));
 			}
 		}
 		if (pd instanceof JavaJdtProperty) {
