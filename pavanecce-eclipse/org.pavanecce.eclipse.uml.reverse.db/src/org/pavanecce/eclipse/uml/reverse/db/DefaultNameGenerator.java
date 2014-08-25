@@ -56,4 +56,19 @@ public class DefaultNameGenerator implements INameGenerator {
 	public boolean isEnum(PersistentTable table) {
 		return false;
 	}
+
+	@Override
+	public boolean isInteresting(PersistentTable table) {
+		return true;
+	}
+
+	@Override
+	public boolean isInteresting(Column column) {
+		return true;
+	}
+
+	@Override
+	public boolean isInteresting(ForeignKey f) {
+		return true;
+	}
 }

@@ -11,6 +11,10 @@ import org.eclipse.papyrus.uml.diagram.clazz.edit.parts.AssociationClassNameEdit
 import org.eclipse.papyrus.uml.diagram.clazz.edit.parts.ClassAttributeCompartmentEditPart;
 import org.eclipse.papyrus.uml.diagram.clazz.edit.parts.ClassEditPart;
 import org.eclipse.papyrus.uml.diagram.clazz.edit.parts.ClassNameEditPart;
+import org.eclipse.papyrus.uml.diagram.clazz.edit.parts.EnumerationEditPart;
+import org.eclipse.papyrus.uml.diagram.clazz.edit.parts.EnumerationEnumerationLiteralCompartmentEditPart;
+import org.eclipse.papyrus.uml.diagram.clazz.edit.parts.EnumerationLiteralEditPart;
+import org.eclipse.papyrus.uml.diagram.clazz.edit.parts.EnumerationNameEditPart;
 import org.eclipse.papyrus.uml.diagram.clazz.edit.parts.ModelEditPart;
 import org.eclipse.papyrus.uml.diagram.clazz.edit.parts.PackageEditPart;
 import org.eclipse.papyrus.uml.diagram.clazz.edit.parts.PackageNameEditPart;
@@ -18,6 +22,8 @@ import org.eclipse.papyrus.uml.diagram.clazz.edit.parts.PackagePackageableElemen
 import org.eclipse.papyrus.uml.diagram.clazz.edit.parts.PropertyForClassEditPart;
 import org.eclipse.uml2.uml.AssociationClass;
 import org.eclipse.uml2.uml.Classifier;
+import org.eclipse.uml2.uml.Enumeration;
+import org.eclipse.uml2.uml.EnumerationLiteral;
 import org.eclipse.uml2.uml.Package;
 import org.eclipse.uml2.uml.Property;
 import org.eclipse.uml2.uml.util.UMLSwitch;
@@ -63,6 +69,32 @@ public class ShapeBuilder extends UMLSwitch<Shape> {
 				classShape.getPersistedChildren().add(classNameDecorationNode);
 				String id = AssociationClassAttributeCompartmentEditPart.VISUAL_ID + "";
 				addAttributeCompartment(classShape, id, object);
+				// addCompartment(classShape, AssociationClassOperationCompartmentEditPart.VISUAL_ID + "");
+				// addCompartment(classShape, AssociationClassNestedClassifierCompartmentEditPart.VISUAL_ID + "");
+			} else if (object instanceof Enumeration) {
+				classShape.setType(EnumerationEditPart.VISUAL_ID + "");
+				classNameDecorationNode.setType(EnumerationNameEditPart.VISUAL_ID + "");
+				classShape.getPersistedChildren().add(classNameDecorationNode);
+				String id = EnumerationEnumerationLiteralCompartmentEditPart.VISUAL_ID + "";
+				BasicCompartment attrComp = addCompartment(classShape, id);
+				for (EnumerationLiteral lit : ((Enumeration) object).getOwnedLiterals()) {
+					Shape propertyShape = NotationFactory.eINSTANCE.createShape();
+					propertyShape.setElement(lit);
+					Bounds bnds = NotationFactory.eINSTANCE.createBounds();
+					bnds.setX(0);
+					bnds.setY(0);
+					// bnds.setHeight(20);
+					propertyShape.setLayoutConstraint(bnds);
+					propertyShape.setType(EnumerationLiteralEditPart.VISUAL_ID + "");
+					attrComp.getPersistedChildren().add(propertyShape);
+
+				}
+				Bounds bnds = NotationFactory.eINSTANCE.createBounds();
+				bnds.setX(0);
+				bnds.setY(0);
+				bnds.setHeight((int) Math.ceil(((Enumeration) object).getOwnedLiterals().size() * 20) + 40);
+				bnds.setWidth(300);
+				classShape.setLayoutConstraint(bnds);
 				// addCompartment(classShape, AssociationClassOperationCompartmentEditPart.VISUAL_ID + "");
 				// addCompartment(classShape, AssociationClassNestedClassifierCompartmentEditPart.VISUAL_ID + "");
 			} else {

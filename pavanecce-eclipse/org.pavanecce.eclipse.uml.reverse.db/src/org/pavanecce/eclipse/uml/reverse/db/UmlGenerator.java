@@ -66,7 +66,7 @@ import org.pavanecce.uml.common.util.UmlResourceSetFactory;
 public class UmlGenerator {
 
 	private ClassifierFactory factory;
-	private INameGenerator nameGenerator = new FusionNameGenerator();
+	private INameGenerator nameGenerator = new VasNameGenerator();
 	private Collection<Classifier> pkPopulatedClasses = new HashSet<Classifier>();
 	private Set<Element> databaseElements = new HashSet<Element>();
 
@@ -79,38 +79,39 @@ public class UmlGenerator {
 
 	private void importTables(Collection<PersistentTable> selection, Model library) {
 		for (PersistentTable t : selection) {
-			Classifier classifier = factory.getClassifierFor(t);
-			if (classifier instanceof AssociationClass) {
-				AssociationClass cls = (AssociationClass) classifier;
-				ensurePrimaryKeyPopulated(t, cls);
-				Collection<ForeignKey> uniqueForeignKeys = populateAssociationEnds(t, cls);
-				List<ForeignKey> otherForeignKeys = t.getForeignKeys();
-				otherForeignKeys.removeAll(uniqueForeignKeys);
-				for (ForeignKey foreignKey : otherForeignKeys) {
-					Association ass = findOrCreateAssociation(cls, foreignKey);
-					Property toEnd = populateToEnd(foreignKey, ass);
-					populateFromEnd(foreignKey, ass, toEnd);
+			if (nameGenerator.isInteresting(t)) {
+				Classifier classifier = factory.getClassifierFor(t);
+				if (classifier instanceof AssociationClass) {
+					AssociationClass cls = (AssociationClass) classifier;
+					ensurePrimaryKeyPopulated(t, cls);
+					Collection<ForeignKey> uniqueForeignKeys = populateAssociationEnds(t, cls);
+					List<ForeignKey> otherForeignKeys = t.getForeignKeys();
+					otherForeignKeys.removeAll(uniqueForeignKeys);
+					for (ForeignKey foreignKey : otherForeignKeys) {
+						Association ass = findOrCreateAssociation(cls, foreignKey);
+						Property toEnd = populateToEnd(foreignKey, ass);
+						populateFromEnd(foreignKey, ass, toEnd);
+					}
+					populateAttributes(library, classifier, t);
+					populateIndices(cls, t);
+				} else if (classifier instanceof Association) {
+					populateIndices(classifier, t);
+					populateAssociationEnds(t, (Association) classifier);
+				} else if (classifier instanceof Class) {
+					Class cls = (Class) classifier;
+					ensurePrimaryKeyPopulated(t, cls);
+					populateAttributes(library, classifier, t);
+					populateAssociations(library, cls, t);
+					populateIndices(cls, t);
+				} else if (classifier instanceof Enumeration) {
+					Enumeration cls = (Enumeration) classifier;
+					ensurePrimaryKeyPopulated(t, cls);
+					populateAttributes(library, classifier, t);
+					populateAssociations(library, cls, t);
+					populateIndices(cls, t);
+					populateEnumLiterals(t, cls);
 				}
-				populateAttributes(library, classifier, t);
-				populateIndices(cls, t);
-			} else if (classifier instanceof Association) {
-				populateIndices(classifier, t);
-				populateAssociationEnds(t, (Association) classifier);
-			} else if (classifier instanceof Class) {
-				Class cls = (Class) classifier;
-				ensurePrimaryKeyPopulated(t, cls);
-				populateAttributes(library, classifier, t);
-				populateAssociations(library, cls, t);
-				populateIndices(cls, t);
-			} else if (classifier instanceof Enumeration) {
-				Enumeration cls = (Enumeration) classifier;
-				ensurePrimaryKeyPopulated(t, cls);
-				populateAttributes(library, classifier, t);
-				populateAssociations(library, cls, t);
-				populateIndices(cls, t);
-				populateEnumLiterals(t, cls);
 			}
-
 		}
 	}
 
@@ -119,53 +120,73 @@ public class UmlGenerator {
 			ResultSet rst = ((JDBCTable) t).getConnection().createStatement().executeQuery("select * from " + t.getName());
 			while (rst.next()) {
 				EList<Property> ownedAttributes = cls.getOwnedAttributes();
-				Property name = null;
+				Property nameAttribute = null;
 				for (Property property : ownedAttributes) {
-					if (property.getName().equalsIgnoreCase("name")) {
-						name = property;
+					if (property.getName().equalsIgnoreCase("code")) {
+						nameAttribute = property;
 						break;
-					} else if (property.getName().equalsIgnoreCase("code")) {
-						name = property;
 					}
 				}
-				EnumerationLiteral ownedLiteral = cls.getOwnedLiteral(rst.getString(PersistentNameUtil.getPersistentName(name)), false, true);
-				for (Property property : ownedAttributes) {
-					if (property.getType() instanceof DataType) {
-						Slot slot = EmfValueSpecificationUtil.getSlotForFeature(ownedLiteral, property);
-						if (slot == null) {
-							slot = ownedLiteral.createSlot();
-							slot.setDefiningFeature(property);
+				if (nameAttribute == null) {
+					for (Property property : ownedAttributes) {
+						if (property.getName().equalsIgnoreCase("name")) {
+							nameAttribute = property;
+							break;
 						}
-						slot.getValues().clear();
-						ValueSpecification newValue = null;
-						if (EmfClassifierUtil.comformsToLibraryType(property.getType(), "String")) {
-							LiteralString value = UMLFactory.eINSTANCE.createLiteralString();
-							value.setName(property.getName());
-							value.setValue(rst.getString(PersistentNameUtil.getPersistentName(property)));
-							newValue = value;
-						} else if (EmfClassifierUtil.comformsToLibraryType(property.getType(), "Integer")) {
-							LiteralInteger value = UMLFactory.eINSTANCE.createLiteralInteger();
-							value.setName(property.getName());
-							value.setValue(rst.getInt(PersistentNameUtil.getPersistentName(property)));
-							newValue = value;
-						} else if (EmfClassifierUtil.comformsToLibraryType(property.getType(), "Real")) {
-							LiteralReal value = UMLFactory.eINSTANCE.createLiteralReal();
-							value.setName(property.getName());
-							value.setValue(rst.getDouble(PersistentNameUtil.getPersistentName(property)));
-							newValue = value;
-						} else if (EmfClassifierUtil.comformsToLibraryType(property.getType(), "Boolean")) {
-							LiteralBoolean value = UMLFactory.eINSTANCE.createLiteralBoolean();
-							value.setName(property.getName());
-							value.setValue(rst.getBoolean(PersistentNameUtil.getPersistentName(property)));
-							newValue = value;
-						} else if (EmfClassifierUtil.comformsToLibraryType(property.getType(), "DateTime")) {
-							LiteralString value = UMLFactory.eINSTANCE.createLiteralString();
-							value.setName(property.getName());
-							value.setValue(rst.getString(PersistentNameUtil.getPersistentName(property)));
-							newValue = value;
+					}
+				}
+				if (nameAttribute == null) {
+					for (Property property : ownedAttributes) {
+						if (property.getName().endsWith("Name")) {
+							nameAttribute = property;
+							break;
 						}
+					}
+				}
+				if (nameAttribute == null) {
+					System.out.println();
+				}
+				String literalName = rst.getString(PersistentNameUtil.getPersistentName(nameAttribute));
+				if (literalName != null && !literalName.trim().isEmpty()) {
+					EnumerationLiteral ownedLiteral = cls.getOwnedLiteral(literalName, false, true);
+					for (Property property : ownedAttributes) {
+						if (property.getType() instanceof DataType) {
+							Slot slot = EmfValueSpecificationUtil.getSlotForFeature(ownedLiteral, property);
+							if (slot == null) {
+								slot = ownedLiteral.createSlot();
+								slot.setDefiningFeature(property);
+							}
+							slot.getValues().clear();
+							ValueSpecification newValue = null;
+							if (EmfClassifierUtil.comformsToLibraryType(property.getType(), "String")) {
+								LiteralString value = UMLFactory.eINSTANCE.createLiteralString();
+								value.setName(property.getName());
+								value.setValue(rst.getString(PersistentNameUtil.getPersistentName(property)));
+								newValue = value;
+							} else if (EmfClassifierUtil.comformsToLibraryType(property.getType(), "Integer")) {
+								LiteralInteger value = UMLFactory.eINSTANCE.createLiteralInteger();
+								value.setName(property.getName());
+								value.setValue(rst.getInt(PersistentNameUtil.getPersistentName(property)));
+								newValue = value;
+							} else if (EmfClassifierUtil.comformsToLibraryType(property.getType(), "Real")) {
+								LiteralReal value = UMLFactory.eINSTANCE.createLiteralReal();
+								value.setName(property.getName());
+								value.setValue(rst.getDouble(PersistentNameUtil.getPersistentName(property)));
+								newValue = value;
+							} else if (EmfClassifierUtil.comformsToLibraryType(property.getType(), "Boolean")) {
+								LiteralBoolean value = UMLFactory.eINSTANCE.createLiteralBoolean();
+								value.setName(property.getName());
+								value.setValue(rst.getBoolean(PersistentNameUtil.getPersistentName(property)));
+								newValue = value;
+							} else if (EmfClassifierUtil.comformsToLibraryType(property.getType(), "DateTime")) {
+								LiteralString value = UMLFactory.eINSTANCE.createLiteralString();
+								value.setName(property.getName());
+								value.setValue(rst.getString(PersistentNameUtil.getPersistentName(property)));
+								newValue = value;
+							}
 
-						slot.getValues().add(newValue);
+							slot.getValues().add(newValue);
+						}
 					}
 				}
 			}
@@ -185,7 +206,7 @@ public class UmlGenerator {
 			}
 			if (foreignKeys.size() == 2) {
 				for (ForeignKey fk : foreignKeys) {
-					populateToEnd(fk, ass).setUnlimitedNaturalDefaultValue(LiteralUnlimitedNatural.UNLIMITED);
+					populateToEnd(fk, ass).setUpper(LiteralUnlimitedNatural.UNLIMITED);
 				}
 				return foreignKeys;
 			}
@@ -204,7 +225,7 @@ public class UmlGenerator {
 		// if we're here, the FK's did not fall in a unique constraint. Just
 		// take the first two.
 		for (ForeignKey fk : firstTwoForeignKeys) {
-			populateToEnd(fk, ass).setUnlimitedNaturalDefaultValue(LiteralUnlimitedNatural.UNLIMITED);
+			populateToEnd(fk, ass).setUpper(LiteralUnlimitedNatural.UNLIMITED);
 		}
 		return firstTwoForeignKeys;
 
@@ -244,16 +265,18 @@ public class UmlGenerator {
 
 	private void registerAffectedElements(Collection<PersistentTable> selection) {
 		for (PersistentTable pt : selection) {
-			Classifier c = factory.getClassifierFor(pt);
-			addDependentDatabaseElements(c);
-			EList<Property> ownedAttributes = getOwnedAttributes(c);
-			addDataAttributes(ownedAttributes);
-			Property pk = EmfPropertyUtil.getPrimaryKey(c);
-			if (pk != null && pk.getType().eClass().equals(UMLPackage.eINSTANCE.getDataType())) {
-				DataType pkType = (DataType) pk.getType();
-				EList<Property> ownedAttributes2 = pkType.getOwnedAttributes();
-				addDataAttributes(ownedAttributes2);
-				addDependentDatabaseElements(pkType);
+			if (nameGenerator.isInteresting(pt)) {
+				Classifier c = factory.getClassifierFor(pt);
+				addDependentDatabaseElements(c);
+				EList<Property> ownedAttributes = getOwnedAttributes(c);
+				addDataAttributes(ownedAttributes);
+				Property pk = EmfPropertyUtil.getPrimaryKey(c);
+				if (pk != null && pk.getType().eClass().equals(UMLPackage.eINSTANCE.getDataType())) {
+					DataType pkType = (DataType) pk.getType();
+					EList<Property> ownedAttributes2 = pkType.getOwnedAttributes();
+					addDataAttributes(ownedAttributes2);
+					addDependentDatabaseElements(pkType);
+				}
 			}
 		}
 	}
@@ -391,7 +414,6 @@ public class UmlGenerator {
 						primaryKey.setValue(factory.getAttributeStereotype(), "persistentName", pkColumn.getName());
 					}
 					databaseElements.remove(primaryKey);
-
 				}
 			} else if (classifier instanceof Class) {
 				DataType pkDataType = (DataType) ((Class) classifier).getNestedClassifier(classifier.getName() + "PK", false,
@@ -399,11 +421,13 @@ public class UmlGenerator {
 				List<ForeignKey> foreignKeys = table.getForeignKeys();
 				List<Column> pkColums = table.getPrimaryKey().getMembers();
 				for (ForeignKey foreignKey : foreignKeys) {
-					EList<Column> foreignKeyMembers = foreignKey.getMembers();
-					if (pkColums.containsAll(foreignKeyMembers)) {
-						BaseTable referencedTable = getReferencedTable(foreignKey);
-						primaryKey = pkDataType.getOwnedAttribute(nameGenerator.calcAssociationEndName((PersistentTable) referencedTable),
-								factory.getClassifierFor((PersistentTable) referencedTable), false, UMLPackage.eINSTANCE.getProperty(), true);
+					if (nameGenerator.isInteresting(foreignKey) && nameGenerator.isInteresting(getReferencedTable(foreignKey))) {
+						EList<Column> foreignKeyMembers = foreignKey.getMembers();
+						if (pkColums.containsAll(foreignKeyMembers)) {
+							BaseTable referencedTable = getReferencedTable(foreignKey);
+							primaryKey = pkDataType.getOwnedAttribute(nameGenerator.calcAssociationEndName((PersistentTable) referencedTable),
+									factory.getClassifierFor((PersistentTable) referencedTable), false, UMLPackage.eINSTANCE.getProperty(), true);
+						}
 					}
 				}
 				for (Column column : pkColums) {
@@ -426,8 +450,14 @@ public class UmlGenerator {
 				throw new RuntimeException("Composite Primary Keys not supported for Enumerations");
 
 			}
-			if (factory.getEntityStereotype() != null) {
-				classifier.setValue(factory.getEntityStereotype(), "primaryKey", primaryKey);
+			if (classifier instanceof Enumeration) {
+				if (factory.getEnumerationStereotype() != null) {
+					classifier.setValue(factory.getEnumerationStereotype(), "primaryKey", primaryKey);
+				}
+			} else if (classifier instanceof Class) {
+				if (factory.getEntityStereotype() != null) {
+					classifier.setValue(factory.getEntityStereotype(), "primaryKey", primaryKey);
+				}
 			}
 		}
 		List<? extends ForeignKey> foreignKeys = table.getForeignKeys();
@@ -467,23 +497,25 @@ public class UmlGenerator {
 	private void populateAttributes(Package modelOrProfile, Classifier classifier, PersistentTable binding) {
 		EList<Column> columns = binding.getColumns();
 		for (Column c : columns) {
-			if (!(c.isPartOfPrimaryKey() || c.isPartOfForeignKey())) {
-				Property attr = findAttribute(c, classifier.getAttributes());
-				if (attr == null) {
-					attr = createAttribute(classifier, c);
-				}
-				databaseElements.remove(attr);
-				if (factory.getAttributeStereotype() != null) {
-					if (!attr.isStereotypeApplied(factory.getAttributeStereotype())) {
-						attr.applyStereotype(factory.getAttributeStereotype());
+			if (nameGenerator.isInteresting(c)) {
+				if (!(c.isPartOfPrimaryKey() || c.isPartOfForeignKey())) {
+					Property attr = findAttribute(c, classifier.getAttributes());
+					if (attr == null) {
+						attr = createAttribute(classifier, c);
 					}
-					attr.setValue(factory.getAttributeStereotype(), "persistentName", c.getName());
+					databaseElements.remove(attr);
+					if (factory.getAttributeStereotype() != null) {
+						if (!attr.isStereotypeApplied(factory.getAttributeStereotype())) {
+							attr.applyStereotype(factory.getAttributeStereotype());
+						}
+						attr.setValue(factory.getAttributeStereotype(), "persistentName", c.getName());
+					}
+					attr.setType(factory.getDataTypeFor(c));
+					attr.setIsReadOnly(false);
+					attr.setIsDerived(false);
+					attr.setLower(c.isNullable() ? 0 : 1);
+					attr.setUpper(1);
 				}
-				attr.setType(factory.getDataTypeFor(c));
-				attr.setIsReadOnly(false);
-				attr.setIsDerived(false);
-				attr.setLower(c.isNullable() ? 0 : 1);
-				attr.setUpper(1);
 			}
 		}
 	}
@@ -491,9 +523,19 @@ public class UmlGenerator {
 	private void populateAssociations(Package modelOrProfile, Classifier fromClass, PersistentTable table) {
 		List<ForeignKey> foreignKeys = table.getForeignKeys();
 		for (ForeignKey foreignKey : foreignKeys) {
-			Association ass = findOrCreateAssociation(fromClass, foreignKey);
-			Property toEnd = populateToEnd(foreignKey, ass);
-			populateFromEnd(foreignKey, ass, toEnd);
+			if (nameGenerator.isInteresting(foreignKey) && nameGenerator.isInteresting(getReferencedTable(foreignKey))) {
+				Association ass = findOrCreateAssociation(fromClass, foreignKey);
+				Property toEnd = populateToEnd(foreignKey, ass);
+				populateFromEnd(foreignKey, ass, toEnd);
+				determineNavigability(toEnd);
+				determineNavigability(toEnd.getOtherEnd());
+			}
+		}
+	}
+
+	private void determineNavigability(Property toEnd) {
+		if (toEnd.getType() instanceof Enumeration) {
+			toEnd.getOtherEnd().setIsNavigable(false);
 		}
 	}
 
@@ -606,6 +648,9 @@ public class UmlGenerator {
 		Property attr = null;
 		if (cls instanceof org.eclipse.uml2.uml.Class) {
 			attr = ((org.eclipse.uml2.uml.Class) cls).getOwnedAttribute(nameGenerator.calcAttributeName(pd), factory.getDataTypeFor(pd), false,
+					UMLPackage.eINSTANCE.getProperty(), true);
+		} else if (cls instanceof org.eclipse.uml2.uml.DataType) {
+			attr = ((org.eclipse.uml2.uml.DataType) cls).getOwnedAttribute(nameGenerator.calcAttributeName(pd), factory.getDataTypeFor(pd), false,
 					UMLPackage.eINSTANCE.getProperty(), true);
 		}
 		return attr;

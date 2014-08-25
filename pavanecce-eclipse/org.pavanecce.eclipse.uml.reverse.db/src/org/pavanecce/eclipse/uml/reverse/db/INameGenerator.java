@@ -20,4 +20,12 @@ public interface INameGenerator {
 	boolean isAssociation(PersistentTable table);
 
 	boolean isEnum(PersistentTable table);
+
+	boolean isInteresting(PersistentTable table);
+
+	boolean isInteresting(Column column);
+
+	boolean isInteresting(ForeignKey f);
+	
+	
 }

@@ -14,4 +14,5 @@ Require-Bundle: org.eclipse.papyrus.editor,
  org.eclipse.papyrus.infra.gmfdiag.common,
  org.eclipse.papyrus.uml.diagram.clazz,
  org.pavanecce.eclipse.uml.visualization,
- org.pavanecce.common.util
+ org.pavanecce.common.util,
+ org.eclipse.papyrus.uml.diagram.statemachine

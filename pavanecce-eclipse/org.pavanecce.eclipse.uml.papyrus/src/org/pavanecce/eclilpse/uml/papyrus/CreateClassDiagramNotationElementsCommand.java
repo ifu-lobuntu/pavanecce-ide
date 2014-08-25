@@ -22,6 +22,7 @@ import org.eclipse.papyrus.infra.core.resource.sasheditor.SashModel;
 import org.eclipse.papyrus.infra.core.sashwindows.di.DiFactory;
 import org.eclipse.papyrus.infra.core.sashwindows.di.PageRef;
 import org.eclipse.papyrus.infra.core.sashwindows.di.SashWindowsMngr;
+import org.eclipse.papyrus.infra.core.sashwindows.di.TabFolder;
 import org.eclipse.papyrus.infra.gmfdiag.common.model.NotationModel;
 import org.eclipse.papyrus.uml.diagram.clazz.edit.parts.ModelEditPart;
 import org.eclipse.uml2.uml.Association;
@@ -72,7 +73,8 @@ public class CreateClassDiagramNotationElementsCommand extends AbstractCommand {
 		notationModel.getResource().getContents().add(dgm);
 		PageRef page = DiFactory.eINSTANCE.createPageRef();
 		page.setEmfPageIdentifier(dgm);
-		sashWindowsMngr.getPageList().getAvailablePage().add(page);
+		TabFolder tabFolder = sashWindowsMngr.getSashModel().getCurrentSelection();
+		sashWindowsMngr.getSashModel().addPage(tabFolder, page);
 		diagrams.add(dgm);
 		for (Element type : elements) {
 			relationshipExtractor.doSwitch(type);
