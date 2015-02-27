@@ -18,6 +18,22 @@ import org.pavanecce.eclipse.uml.visualization.RelationshipDirection;
 import org.pavanecce.eclipse.uml.visualization.UmlVisualizationPlugin;
 
 public class PapyrusDiagramCreator implements IDiagramCreator {
+	private abstract class OnTheFlyCommand extends AbstractCommand {
+
+		private OnTheFlyCommand() {
+		}
+
+		@Override
+		public void redo() {
+			// TODO Auto-generated method stub
+		}
+
+		@Override
+		public boolean canExecute() {
+			return true;
+		}
+	}
+
 	@Override
 	public boolean matches(IEditorPart editor) {
 		return editor instanceof PapyrusMultiDiagramEditor;
@@ -33,38 +49,31 @@ public class PapyrusDiagramCreator implements IDiagramCreator {
 		final IPageManager pageManager = (IPageManager) e.getAdapter(IPageManager.class);
 		Set<Diagram> diagrams = cmd.getDiagrams();
 		for (final Diagram diagram : diagrams) {
-			e.getEditingDomain().getCommandStack().execute(new AbstractCommand() {
-				@Override
-				public void redo() {
-					// TODO Auto-generated method stub
-				}
+			e.getEditingDomain().getCommandStack().execute(new OnTheFlyCommand() {
 
 				@Override
 				public void execute() {
-					openPageAndLayout(e, pageManager, diagram);
-				}
-
-				@Override
-				public boolean canExecute() {
-					return true;
+					pageManager.openPage(diagram);
 				}
 			});
-		}
-	}
+			e.getEditingDomain().getCommandStack().execute(new OnTheFlyCommand() {
+				@Override
+				public void execute() {
+					IEditorPart activeEditor = e.getActiveEditor();
+					if (activeEditor instanceof DiagramEditor) {
+						DiagramEditor de = (DiagramEditor) activeEditor;
+						@SuppressWarnings("unchecked")
+						ArrangeAction aa = new ArrangeAction(ArrangeAction.ARRANGE_ALL, de.getDiagramEditPart().getChildren());
+						try {
+							aa.getCommand().execute();
+						} catch (Exception e2) {
+							UmlVisualizationPlugin.logInfo(e2.toString());
+						}
+					}
 
-	private void openPageAndLayout(final PapyrusMultiDiagramEditor e, final IPageManager pageManager, final Diagram diagram) {
-		pageManager.openPage(diagram);
-		IEditorPart activeEditor = e.getActiveEditor();
-		if (activeEditor instanceof DiagramEditor) {
-			DiagramEditor de = (DiagramEditor) activeEditor;
-			@SuppressWarnings("unchecked")
-			ArrangeAction aa = new ArrangeAction(ArrangeAction.ARRANGE_ALL, de.getDiagramEditPart().getChildren());
-			try {
-				aa.getCommand().execute();
-			} catch (Exception e2) {
-				UmlVisualizationPlugin.logInfo(e2.toString());
-			}
-		}
+				}
 
+			});
+		}
 	}
 }

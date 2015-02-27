@@ -282,9 +282,17 @@ public class ClassifierFactory {
 			} else if (dataType instanceof FixedPrecisionDataType || dataType instanceof ApproximateNumericDataType) {
 				result = umlLibrary.getOwnedType("Real");
 			} else if (dataType instanceof DateDataType) {
-				result = findInImports(model, "DateTime");
+				if(dataType.getName().equalsIgnoreCase("Date")){
+					result = findInImports(model, "Date");
+				}else{
+					result = findInImports(model, "DateTime");
+				}
 			} else if (dataType instanceof TimeDataType) {
-				result = findInImports(model, "Time");
+				if(dataType.getName().equalsIgnoreCase("Time")){
+					result = findInImports(model, "Time");
+				}else{
+					result = findInImports(model, "DateTime");
+				}
 			} else if (dataType instanceof BinaryStringDataType) {
 				result = findInImports(model, "BinaryLargeObject");
 			}

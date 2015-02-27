@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/org.pavanecce.eclipse.feature_0.0.1.qualifier.jar" id="org.pavanecce.eclipse.feature" version="0.0.1.qualifier">
+      <category name="pavanecce"/>
+   </feature>
+   <category-def name="pavanecce" label="Pavanecce"/>
+</site>

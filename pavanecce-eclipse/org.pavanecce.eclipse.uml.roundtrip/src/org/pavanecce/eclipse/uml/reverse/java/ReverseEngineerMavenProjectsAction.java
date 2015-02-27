@@ -7,6 +7,7 @@ import java.util.Set;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.emf.common.command.AbstractCommand;
 import org.eclipse.emf.common.command.Command;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -30,7 +31,7 @@ public class ReverseEngineerMavenProjectsAction extends AbstractReverseEngineerA
 	}
 
 	@Override
-	protected Command buildCommand(final Package model) {
+	protected Command buildCommand(final Package model, IProgressMonitor pm) {
 		try {
 			final Collection<IContainer> types = selectContainers(selection);
 			return new AbstractCommand() {

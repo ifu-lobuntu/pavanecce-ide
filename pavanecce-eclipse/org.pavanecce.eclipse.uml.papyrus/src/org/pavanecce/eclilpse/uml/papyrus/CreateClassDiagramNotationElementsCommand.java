@@ -71,10 +71,6 @@ public class CreateClassDiagramNotationElementsCommand extends AbstractCommand {
 		dgm.setElement(pkg);
 		dgm.setName(NameConverter.capitalize(pkg.getName() + " " + suffix));
 		notationModel.getResource().getContents().add(dgm);
-		PageRef page = DiFactory.eINSTANCE.createPageRef();
-		page.setEmfPageIdentifier(dgm);
-		TabFolder tabFolder = sashWindowsMngr.getSashModel().getCurrentSelection();
-		sashWindowsMngr.getSashModel().addPage(tabFolder, page);
 		diagrams.add(dgm);
 		for (Element type : elements) {
 			relationshipExtractor.doSwitch(type);

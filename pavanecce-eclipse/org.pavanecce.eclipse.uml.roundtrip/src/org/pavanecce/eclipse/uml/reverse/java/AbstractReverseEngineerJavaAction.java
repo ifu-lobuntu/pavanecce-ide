@@ -119,7 +119,7 @@ public abstract class AbstractReverseEngineerJavaAction extends AbstractReverseE
 	}
 
 	@Override
-	protected Command buildCommand(final Package model) {
+	protected Command buildCommand(final Package model, org.eclipse.core.runtime.IProgressMonitor pm) {
 		return new AbstractCommand() {
 			@Override
 			public boolean canExecute() {

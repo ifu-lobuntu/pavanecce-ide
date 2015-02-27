@@ -18,6 +18,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.datatools.connectivity.sqm.core.rte.jdbc.JDBCTable;
 import org.eclipse.datatools.modelbase.sql.constraints.ForeignKey;
 import org.eclipse.datatools.modelbase.sql.constraints.Index;
@@ -66,18 +67,19 @@ import org.pavanecce.uml.common.util.UmlResourceSetFactory;
 public class UmlGenerator {
 
 	private ClassifierFactory factory;
-	private INameGenerator nameGenerator = new VasNameGenerator();
+	private INameGenerator nameGenerator = new FusionNameGenerator();
 	private Collection<Classifier> pkPopulatedClasses = new HashSet<Classifier>();
 	private Set<Element> databaseElements = new HashSet<Element>();
 
-	public void generateUml(Collection<PersistentTable> selection, Model library) {
+	public void generateUml(Collection<PersistentTable> selection, Model library, IProgressMonitor pm) {
 		init(library);
 		registerAffectedElements(selection);
-		importTables(selection, library);
+		importTables(selection, library,pm);
 		removeObsoleteElements();
 	}
 
-	private void importTables(Collection<PersistentTable> selection, Model library) {
+	private void importTables(Collection<PersistentTable> selection, Model library, IProgressMonitor pm) {
+		pm.beginTask("Importing Tables", selection.size());
 		for (PersistentTable t : selection) {
 			if (nameGenerator.isInteresting(t)) {
 				Classifier classifier = factory.getClassifierFor(t);
@@ -112,7 +114,9 @@ public class UmlGenerator {
 					populateEnumLiterals(t, cls);
 				}
 			}
+			pm.worked(1);
 		}
+		pm.done();
 	}
 
 	private void populateEnumLiterals(PersistentTable t, Enumeration cls) {
@@ -183,9 +187,18 @@ public class UmlGenerator {
 								value.setName(property.getName());
 								value.setValue(rst.getString(PersistentNameUtil.getPersistentName(property)));
 								newValue = value;
+							} else if (EmfClassifierUtil.comformsToLibraryType(property.getType(), "Time")) {
+								LiteralString value = UMLFactory.eINSTANCE.createLiteralString();
+								value.setName(property.getName());
+								value.setValue(rst.getString(PersistentNameUtil.getPersistentName(property)));
+								newValue = value;
+							}else{
+								EmfClassifierUtil.comformsToLibraryType(property.getType(), "Time");
+								System.out.println(property.getType());
 							}
-
-							slot.getValues().add(newValue);
+							if(newValue!=null){
+								slot.getValues().add(newValue);
+							}
 						}
 					}
 				}

@@ -6,6 +6,11 @@ import java.util.HashSet;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubProgressMonitor;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.emf.common.command.AbstractCommand;
 import org.eclipse.emf.common.command.Command;
 import org.eclipse.emf.common.util.EList;
@@ -86,23 +91,39 @@ public abstract class AbstractReverseEngineerAction extends AbstractEditingDomai
 		}
 	}
 
-	public void reverseInto(IFile file) {
+	public void reverseInto(final IFile file) {
 		setSelectedEditor(file.getName());
-		try {
-			EditingDomain ed = (EditingDomain) selectedEditor.getAdapter(EditingDomain.class);
-			final EList<Resource> resources = ed.getResourceSet().getResources();
-			Package model = null;
-			for (Resource resource : resources) {
-				if (resource.getURI().trimFileExtension().lastSegment().equals(file.getLocation().removeFileExtension().lastSegment())
-						&& resource.getURI().fileExtension().equals("uml")) {
-					model = (Package) resource.getContents().get(0);
+		final EditingDomain ed = (EditingDomain) selectedEditor.getAdapter(EditingDomain.class);
+		final Package model = findModel(file, ed);
+		if (model != null) {
+			new Job("Reverse....") {
+
+				@Override
+				protected IStatus run(IProgressMonitor monitor) {
+					try {
+						monitor.beginTask("Reverse...", 100);
+						ed.getCommandStack().execute(buildCommand(model, new SubProgressMonitor(monitor,80)));
+						file.getProject().refreshLocal(IResource.DEPTH_INFINITE, new SubProgressMonitor(monitor,20));
+					} catch (CoreException e) {
+						e.printStackTrace();
+					} finally {
+						monitor.done();
+					}
+					return Status.OK_STATUS;
 				}
-			}
-			ed.getCommandStack().execute(buildCommand(model));
-			file.getProject().refreshLocal(IResource.DEPTH_INFINITE, null);
-		} catch (CoreException e) {
-			e.printStackTrace();
+			}.schedule();
 		}
+	}
+
+	protected Package findModel(final IFile file, final EditingDomain ed) {
+		final EList<Resource> resources = ed.getResourceSet().getResources();
+		for (Resource resource : resources) {
+			if (resource.getURI().trimFileExtension().lastSegment().equals(file.getLocation().removeFileExtension().lastSegment())
+					&& resource.getURI().fileExtension().equals("uml")) {
+				return (Package) resource.getContents().get(0);
+			}
+		}
+		return null;
 	}
 
 	protected boolean canReverseInto(Profile ouf) {
@@ -130,5 +151,5 @@ public abstract class AbstractReverseEngineerAction extends AbstractEditingDomai
 
 	}
 
-	protected abstract Command buildCommand(org.eclipse.uml2.uml.Package model);
+	protected abstract Command buildCommand(org.eclipse.uml2.uml.Package model, IProgressMonitor pm);
 }
