@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.pavanecce</groupId>
 		<artifactId>pavanecce-eclipse</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
+		<version>0.1.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>org.pavanecce.eclipse.plugin.tests</artifactId>
 	<packaging>eclipse-test-plugin</packaging>
